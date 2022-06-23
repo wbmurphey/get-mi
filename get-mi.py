@@ -2,6 +2,7 @@
 
 import json
 import subprocess
+import sys
 
 
 def get_inventory(input: str):
@@ -27,16 +28,32 @@ def get_inventory(input: str):
 
     return mi_dict
 
-while True:
-    # Searching entries dict for user input
-    user_input = str(input('Enter a string to search for: \n'))
-    search_dict = get_inventory(user_input)
+# Gets a string from first argument passed.
+try:
+    guardian_search = str(sys.argv[1])
+except IndexError:
+    exit()
 
-    if search_dict:
-        print('')
-        for k, v in search_dict.items():
-            print(f'{k}\n{v}\n\n')
-        break
-    else:
-        print(f'Search returned no results. Try again.')
-        continue
+# Gets an integer from second argument passed, or uses default integer of 1 if no argument is passed.
+# Will not accept 0 or less as a selection.
+try:
+    selection = int(sys.argv[2])
+except IndexError:
+    selection = 1
+except ValueError:
+    exit()
+
+if selection > 0:
+    selection -= 1
+else:
+    exit()
+
+# Parses AWS inventory for arguments passed
+search_dict = get_inventory(guardian_search)
+
+# Prints to stdout mi number based on arguments passed
+if search_dict:
+    try:
+        sys.stdout.write(search_dict[list(search_dict)[selection]])
+    except IndexError:
+        exit()
